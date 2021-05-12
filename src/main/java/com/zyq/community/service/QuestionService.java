@@ -2,6 +2,7 @@ package com.zyq.community.service;
 
 import com.zyq.community.bean.Question;
 import com.zyq.community.bean.User;
+import com.zyq.community.dto.PaginationDTO;
 import com.zyq.community.dto.QuestionDTO;
 import com.zyq.community.mapper.QuestionMapper;
 import com.zyq.community.mapper.UserMapper;
@@ -23,11 +24,25 @@ public class QuestionService {
     private UserMapper userMapper;
     @Autowired
     private QuestionMapper questionMapper;
-    public List<QuestionDTO> list() {
-        //查询所有发表评论的用户
-        List<Question> questions = questionMapper.list();
-
+    public PaginationDTO list1(Integer page, Integer size) {
+        PaginationDTO paginationDTO = new PaginationDTO();
+        //查出数据的总数
+        Integer count =questionMapper.count();
+        //分页功能的实现
+        paginationDTO.setPagination(count,page,size);
+        if (page<1){
+            page=1;
+        }
+        if (page>paginationDTO.getTotalPage()){
+            page=paginationDTO.getTotalPage();
+        }
+        //offset : 分多少页
+        Integer offset = size*(page-1);
+        //查询5个发表评论的用户
+        //select * from question limit 10,5   所以需要传入 offset size
+        List<Question> questions = questionMapper.list1(offset,size);
         List<QuestionDTO> questionDTOlist = new ArrayList<>();
+
         //循环所有的用户
         for (Question question: questions) {
             //根据ID查询所有用户
@@ -37,6 +52,32 @@ public class QuestionService {
             questionDTO.setUser(user);
             questionDTOlist.add(questionDTO);
         }
-        return questionDTOlist;
+        paginationDTO.setQuestions(questionDTOlist);
+
+        return paginationDTO;
+    }
+
+    public PaginationDTO list2(Integer userId, Integer page, Integer size) {
+        PaginationDTO paginationDTO = new PaginationDTO();
+        Integer count =questionMapper.count();
+        paginationDTO.setPagination(count,page,size);
+        if (page<1){
+            page=1;
+        }
+        if (page>paginationDTO.getTotalPage()){
+            page=paginationDTO.getTotalPage();
+        }
+        Integer offset = size*(page-1);
+        List<Question> questions = questionMapper.list2(userId,offset,size);
+        List<QuestionDTO> questionDTOlist = new ArrayList<>();
+        for (Question question: questions) {
+            User user= userMapper.findById(question.getCreator());
+            QuestionDTO questionDTO =new QuestionDTO();
+            BeanUtils.copyProperties(question,questionDTO);
+            questionDTO.setUser(user);
+            questionDTOlist.add(questionDTO);
+        }
+        paginationDTO.setQuestions(questionDTOlist);
+        return paginationDTO;
     }
 }

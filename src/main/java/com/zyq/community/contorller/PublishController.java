@@ -25,10 +25,12 @@ public class PublishController {
     private UserMapper userMapper;
     @Autowired
     private QuestionMapper questionMapper;
+    //跳转页面
     @GetMapping("/publish")
     public String publish() {
         return "publish";
     }
+    //提交表单
     @PostMapping("/publish")
     //title description tag  是三个需要写入上传的三个参数
     public String doPublish(@RequestParam("title")  String title,
@@ -54,17 +56,19 @@ public class PublishController {
         }
 
         //判断用户是否处于登录状态
-        User user = null;
+        User user =null;
         Cookie[] cookies = request.getCookies();
         if (cookies!=null && cookies.length!=0) {
             for (Cookie cookie : cookies) {
                 if (cookie.getName().equals("token")) {
                     String token = cookie.getValue();
+                    //在登录页面登陆过就会有tokens
+                    // 去数据库中查询是否有这个user
                     user = userMapper.findByToken(token);
+                    //有的话加入session
                     if (user != null) {
                         request.getSession().setAttribute("user", user);
                     }
-                    break;
                 }
             }
         }
