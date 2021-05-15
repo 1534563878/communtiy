@@ -3,10 +3,10 @@
     <head>
     <title>发布---张咏琪社区</title>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-    <link rel="stylesheet" href="css/bootstrap.min.css"/>
-    <link rel="stylesheet" href="css/bootstrap-theme.min.css"/>
-        <link rel="stylesheet" href="css/community.css"/>
-    <script src ="js/bootstrap.min.js" type="application/javascript"></script>
+    <link rel="stylesheet" href="/css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="/css/bootstrap-theme.min.css"/>
+        <link rel="stylesheet" href="/css/community.css"/>
+    <script src ="/js/bootstrap.min.js" type="application/javascript"></script>
 </head>
 <body>
 <nav class="navbar navbar-default">
@@ -36,8 +36,7 @@
                        aria-expanded="false" th:text="${session.user.getName()}"><span class="caret"></span></a>
                     <ul class="dropdown-menu">
                         <li><a href="#">消息中心</a></li>
-                        <li><a href="#">个人资料</a></li>
-                        <li><a href="#">退出登录</a></li>
+                        <li><a href="/logout">退出登录</a></li>
                     </ul>
                 </li>
                 <li th:if="${session.user==null}">
@@ -55,13 +54,14 @@
             <h2><span class="glyphicon glyphicon-plus" aria-hidden="true">发起</span></h2>
 
             <form action="/publish" method="post">
+                <input class="hidden"  name= "id" th:value="${id}"/>
             <div class="form-group">
                 <label for="title">问题标题</label>
                 <input type="text" class="form-control"  th:value="${title}" id="title" name="title" placeholder="问题标题" />
             </div>
                 <div class="form-group">
                     <label for="description">问题补充</label>
-                    <textarea  name="description"  id="description" th:value="${description}" class="form-control" cols="30" rows="10"/>
+                    <input type="text"  class="form-control"  name="description"  id="description" th:value="${description}" style="width: 100%;height: 200px"  placeholder="问题标题" />
                 </div>
 
                 <div class="form-group">
