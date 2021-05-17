@@ -1,7 +1,7 @@
-/*
 
 package com.zyq.community.config;
 import com.zyq.community.bean.User;
+import com.zyq.community.bean.UserExample;
 import com.zyq.community.mapper.UserMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -10,6 +10,7 @@ import org.springframework.web.servlet.ModelAndView;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.util.List;
 
 @Service
 public class SessionInterceptor implements HandlerInterceptor {
@@ -24,10 +25,12 @@ public class SessionInterceptor implements HandlerInterceptor {
                     String token = cookie.getValue();
                     //在登录页面登陆过就会有tokens
                     // 去数据库中查询是否有这个user
-                    User user = userMapper.findByToken(token);
+                    UserExample userExample = new UserExample();
+                    userExample.createCriteria().andTokenEqualTo(token);
+                    List<User> users = userMapper.selectByExample(userExample);
                     //有的话加入session
-                    if (user != null) {
-                        request.getSession().setAttribute("user", user);
+                    if (users.size()!= 0) {
+                        request.getSession().setAttribute("user", users.get(0));
                     }
                 }
             }
@@ -46,4 +49,3 @@ public class SessionInterceptor implements HandlerInterceptor {
     }
 }
 
-*/

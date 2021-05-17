@@ -1,9 +1,12 @@
 package com.zyq.community.service;
 
 import com.zyq.community.bean.User;
+import com.zyq.community.bean.UserExample;
 import com.zyq.community.mapper.UserMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 /**
  * @author zyq
@@ -17,17 +20,24 @@ public class UserService {
 
     public void createOrUpdate(User user) {
         //getAccountId 是唯一标识
-        User dbUser = userMapper.findByAccount(user.getAccountId());
-        if (dbUser == null) {
-            userMapper.insert(user);
+        UserExample userExample = new UserExample();
+        userExample.createCriteria().
+                andAccountIdEqualTo(user.getAccountId());
+        List<User> users = userMapper.selectByExample(userExample);
+        if (users.size()==0) {
             user.setGmtCreate(System.currentTimeMillis());
             user.setGmtModified(user.getGmtCreate());
+            userMapper.insert(user);
         }else {
-            dbUser.setGmtModified(System.currentTimeMillis());
-            dbUser.setAvatarUrl(user.getAvatarUrl());
-            dbUser.setName(user.getName());
-            dbUser.setToken(user.getToken());
-            userMapper.update(dbUser);
+            User dbUser = users.get(0);
+            User updateUser= new User();
+            updateUser.setGmtModified(System.currentTimeMillis());
+            updateUser.setAvatarUrl(user.getAvatarUrl());
+            updateUser.setName(user.getName());
+            updateUser.setToken(user.getToken());
+            UserExample example = new UserExample();
+            example.createCriteria().andIdEqualTo(dbUser.getId());
+            userMapper.updateByExampleSelective(updateUser, example);
         }
     }
 }
